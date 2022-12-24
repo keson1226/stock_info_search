@@ -13,7 +13,7 @@ def re_input(talk):
             return user_input
 
 def get_info():
-    print("歡迎使用台灣股市每日收盤價查找系統!!")
+    print("歡迎使用台灣股市 日收盤價及月平均收盤價 查找系統!!")
     url="https://www.twse.com.tw/zh/exchangeReport/STOCK_DAY_AVG?response=json&date={}{}"
     date=datetime.date.today()
     year=date.year

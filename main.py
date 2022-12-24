@@ -1,10 +1,11 @@
 import json
-
 import urllib.request as request
+
 import matplotlib.pyplot as plt
 
 import day_base
 import month_base
+
 
 def sort_string(word:str):
     isblank=False
@@ -22,11 +23,11 @@ def sort_string(word:str):
 
 if __name__=='__main__':
     plt.rcParams['font.sans-serif']=["Taipei Sans TC Beta"]
-    print()
+    print("歡迎使用 台灣股市資訊 查找系統")
 
     choice=None
     while True:
-        n=day_base.re_input("(1)每日股價查找\n(2)每月股價查找\n請選擇要使用的功能: ")
+        n=day_base.re_input("  (1)日收盤價及月平均收盤價\n  (2)月成交資訊\n請選擇要查找的資訊: ")
         if n>0 and n<3:
             choice=n
             break
@@ -43,22 +44,22 @@ if __name__=='__main__':
             web=web.read().decode('utf-8')
             web_info_json= json.loads(web)
 
-        data=web_info_json["data"]
-        for i in range(len(data)):
-            data[i][1]=float(data[i][1])
-            temp:str=data[i][0]
+        datas=web_info_json["data"]
+        for i in range(len(datas)):
+            datas[i][1]=float(datas[i][1])
+            temp:str=datas[i][0]
             temp=temp.split("/")
             try:
                 temp=temp[2]
             except:pass
             else:
-                data[i][0]=temp
+                datas[i][0]=temp
 
-        month_avg = data.pop(len(data)-1)
+        month_avg = datas.pop(len(datas)-1)
 
         day=[]
         price=[]
-        for i in data:
+        for i in datas:
             day.append(i[0])
             price.append(i[1])
 
@@ -87,6 +88,54 @@ if __name__=='__main__':
         plt.savefig(graph_title+".png")
 
         print("搜索完成，已儲存成圖片檔案 --> {}\n\n謝謝您的使用，歡迎下次再來!!".format(graph_title+".png"))
+    elif choice==2:
+        url=month_base.get_info()
+        req = request.Request(url)
+
+        web_info_json=None
+        with request.urlopen(req) as web:
+            web=web.read().decode('utf-8')
+            web_info_json=json.loads(web)  
+        
+        datas=web_info_json["data"]
+
+        month_list=[]
+        max_list=[]
+        min_list=[]
+        avg_list=[]
+        fields=web_info_json["fields"][1:5]
+        for data in datas:
+            month_list.append(data[1])
+            max_list.append(float(data[2]))
+            min_list.append(float(data[3]))
+            avg_list.append(float(data[4]))
+
+        price_high=max(max_list)
+        price_low=min(min_list)
+        price_gap=(price_high-price_low)/9
+        price_low-=price_gap/2
+        if price_low<0:price_low=0
+        ytag=[]
+        for i in range(6):
+            num=round(price_low+price_gap*i*2,2)
+            if num not in ytag:
+                ytag.append(num)
+        
+        graph_title=sort_string( web_info_json["title"] )
+        plt.figure(figsize=(8,4.5))
+        plt.title(graph_title,fontdict={"fontsize":18,"fontweight":"bold"})
+        plt.plot(month_list,max_list,"g.-",label=fields[1])
+        plt.plot(month_list,min_list,"r.-",label=fields[2])
+        plt.plot(month_list,avg_list,"y--",label=fields[3])
+        plt.yticks(ytag)
+        plt.ylabel("收盤價",fontdict={"fontsize":12})
+        plt.xticks(month_list)
+        plt.xlabel(fields[0],fontdict={"fontsize":12})
+        plt.legend()
+        plt.savefig(graph_title+".png")
+
+        print("搜索完成，已儲存成圖片檔案 --> {}\n\n謝謝您的使用，歡迎下次再來!!".format(graph_title+".png"))
+
 
         
         
