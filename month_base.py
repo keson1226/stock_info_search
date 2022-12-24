@@ -1,4 +1,7 @@
-import datetime,requests
+import datetime
+
+import requests
+
 
 def re_input(talk):
     while True:

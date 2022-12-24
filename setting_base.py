@@ -1,4 +1,6 @@
-import shutil,os
+import os
+import shutil
+
 import matplotlib
 import matplotlib.pyplot as plt
 
