@@ -8,11 +8,10 @@ def re_input(talk):
         user_input=input(talk)
         try:
             user_input=int(user_input)
+            return user_input
         except:
             print('請輸入整數!!\n')
             continue
-        else:
-            return user_input
 
 def get_info():
     print("歡迎使用台灣股市 日收盤價及月平均收盤價 查找系統!!")
